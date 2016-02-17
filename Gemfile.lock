@@ -1,0 +1,28 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    macaddr (1.7.1)
+      systemu (~> 2.6.2)
+    rack (1.6.4)
+    rack-protection (1.5.3)
+      rack
+    ruby-saml-idp (0.3.2)
+      uuid
+    sinatra (1.4.7)
+      rack (~> 1.5)
+      rack-protection (~> 1.4)
+      tilt (>= 1.3, < 3)
+    systemu (2.6.5)
+    tilt (2.0.2)
+    uuid (2.3.8)
+      macaddr (~> 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ruby-saml-idp
+  sinatra
+
+BUNDLED WITH
+   1.11.2

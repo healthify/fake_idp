@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+<h1>Fake SAML SSO Authenticator</h1>
+
+<form action="<%= @saml_acs_url %>" method="post">
+  <input name="SAMLResponse" type="hidden" value="<%= @saml_response %>">
+  <input type="submit" value="Login">
+</form>
+
+<h2>Encrypted Response</h2>
+<pre><%= @saml_response.strip %></pre>
+</body>
+</html>

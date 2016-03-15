@@ -8,7 +8,7 @@ module FakeIdp
         @saml_acs_url = callback_url
 
         @saml_response = encode_SAMLResponse(
-            sso_email,
+            name_id,
             attributes_provider: attributes_statement(signed_in_user_attrs)
         )
 
@@ -27,13 +27,12 @@ module FakeIdp
     def signed_in_user_attrs
       {
         uuid: FakeIdp.configuration.sso_uid,
-        username: FakeIdp.configuration.username,
-        email: sso_email
+        username: FakeIdp.configuration.username
       }
     end
 
-    def sso_email
-      FakeIdp.configuration.email
+    def name_id
+      FakeIdp.configuration.name_id
     end
 
     def mock_saml_request

@@ -8,7 +8,7 @@ describe FakeIdp do
           config.callback_url = 'http://localhost.dev:3000/auth/saml/devidp/callback'
           config.sso_uid = '12345'
           config.username = 'bobthessouser'
-          config.email = 'bobthessouser@example.com'
+          config.name_id = 'bobthessouser@example.com'
         end
       end
 
@@ -30,10 +30,10 @@ describe FakeIdp do
         expect(username).to eq('bobthessouser')
       end
 
-      it "sets the email" do
-        email = FakeIdp.configuration.email
+      it "sets the name_id" do
+        name_id = FakeIdp.configuration.name_id
 
-        expect(email).to eq('bobthessouser@example.com')
+        expect(name_id).to eq('bobthessouser@example.com')
       end
     end
   end

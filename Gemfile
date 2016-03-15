@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in fake_movie_facts.gemspec
+# overrides gem source in gemspec
+# needed to enable attributes statement in SAMLRequest
+gem 'ruby-saml-idp', github: 'lawrencepit/ruby-saml-idp'
+
 gemspec

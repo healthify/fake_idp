@@ -1,9 +1,16 @@
+GIT
+  remote: git://github.com/lawrencepit/ruby-saml-idp.git
+  revision: ae53d76af08711affaeb182e7a877676ab554818
+  specs:
+    ruby-saml-idp (0.3.2)
+      uuid
+
 PATH
   remote: .
   specs:
     fake_idp (0.1.0)
       builder (~> 3.1, >= 2.0)
-      ruby-saml-idp (~> 0.3.2)
+      ruby-saml-idp
       sinatra (~> 1.4.7, >= 1.4.6)
 
 GEM
@@ -31,8 +38,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
-    ruby-saml-idp (0.3.2)
-      uuid
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -51,6 +56,7 @@ DEPENDENCIES
   fake_idp!
   rake (~> 10.0)
   rspec (~> 3.0)
+  ruby-saml-idp!
 
 BUNDLED WITH
    1.11.2

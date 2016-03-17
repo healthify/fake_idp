@@ -14,9 +14,9 @@ To run locally, you first need to set up the following environment variables:
 
 ```ruby
 CALLBACK_URL (the URL of the Healthify app to POST to for SAML authentication - required)
+NAME_ID      (name_id of the user you want to log in as - may be nil/blank)
 SSO_UID      (unique id of the user you want to log in as - may be nil/blank)
 USERNAME     (username of the user you want to log in as - may be nil/blank)
-EMAIL        (email of the user you want to log in as - may be nil/blank)
 ```
 
 The `.env.example` file has examples of what these env variables could look like.
@@ -46,9 +46,9 @@ as environment variables. For example:
 
 ```ruby
 FakeIdp.configure do |config|
-  config.callback_url = "http://localhost.dev:3000/auth/saml/devidp/callback"
-  config.sso_uid = "12345"
-  config.email = nil
+  config.callback_url = 'http://localhost.dev:3000/auth/saml/devidp/callback'
+  config.sso_uid = '12345'
+  config.name_id = 'user@example.com'
   config.username = nil
 end
 ```
@@ -60,8 +60,9 @@ require 'fake_idp'
 
 before(:each) do
   FakeIdp.configure do |config|
-    config.callback_url = consumer_url
-    config.sso_uid = args.fetch(:user_data)[:uuid]
+    config.callback_url = callback_url
+    config.sso_uid = sso_uid
+    config.name_id = name_id
   end
 end
 

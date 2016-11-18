@@ -27,7 +27,10 @@ module FakeIdp
     def signed_in_user_attrs
       {
         uuid: FakeIdp.configuration.sso_uid,
-        username: FakeIdp.configuration.username
+        username: FakeIdp.configuration.username,
+        first_name: FakeIdp.configuration.first_name,
+        last_name: FakeIdp.configuration.last_name,
+        email: FakeIdp.configuration.email
       }
     end
 

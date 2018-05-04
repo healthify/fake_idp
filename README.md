@@ -1,5 +1,9 @@
 # Fake IdP
 
+## About
+
+This is an open source Ruby gem intended for developers needing to spin up a fake Identity Provider (IdP) for testing SAML authentication flows. It's made by the [Healthify](http://healthify.us) team. It's _not_ for setting up an IdP within Healthify—to do that, you'll need to reach out to integrations@healthify.us.
+
 ## Installation
 
 Clone the repo and `cd` into the project directory.

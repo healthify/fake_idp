@@ -7,9 +7,11 @@ module FakeIdp
         decode_SAMLRequest(mock_saml_request)
         @saml_acs_url = callback_url
 
+        self.x509_certificate = idp_certificate
+        self.secret_key = idp_private_key
         @saml_response = encode_SAMLResponse(
-            name_id,
-            attributes_provider: attributes_statement(signed_in_user_attrs)
+          name_id,
+          attributes_provider: attributes_statement(signed_in_user_attrs)
         )
 
         erb :auth
@@ -19,6 +21,16 @@ module FakeIdp
     end
 
     private
+
+    def idp_certificate
+      Base64.encode64(FakeIdp.configuration.idp_certificate) ||
+        SamlIdp::Default::X509_CERTIFICATE
+    end
+
+    def idp_private_key
+      FakeIdp.configuration.idp_private_key ||
+        SamlIdp::Default::SECRET_KEY
+    end
 
     def callback_url
       FakeIdp.configuration.callback_url

@@ -8,6 +8,8 @@ module FakeIdp
       :last_name,
       :email,
       :name_id,
+      :idp_certificate,
+      :idp_private_key,
     )
 
     def initialize
@@ -18,14 +20,8 @@ module FakeIdp
       @last_name = ENV['LAST_NAME']
       @email = ENV['EMAIL']
       @name_id = ENV['NAME_ID']
-    end
-
-    def x509_certificate
-      SamlIdp::Default::X509_CERTIFICATE
-    end
-
-    def secret_key
-      SamlIdp::Default::SECRET_KEY
+      @idp_certificate = ENV['IDP_CERTIFICATE']
+      @idp_private_key = ENV['IDP_PRIVATE_KEY']
     end
   end
 end

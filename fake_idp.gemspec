@@ -6,7 +6,11 @@ require 'fake_idp/version'
 Gem::Specification.new do |spec|
   spec.name          = "fake_idp"
   spec.version       = FakeIdp::VERSION
-  spec.authors       = ["Shelby Switzer"]
+  spec.authors       = [
+    "Shelby Switzer",
+    "Tyler Willingham",
+    "Robyn-Dale Samuda",
+  ]
   spec.email         = ["shelby@healthify.us"]
 
   spec.summary       = 'Fake IDP to test SAML authentication'

@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (0.2.0)
+    fake_idp (0.3.0)
       ruby-saml-idp
       sinatra (~> 2.0.0)
 

@@ -53,13 +53,16 @@ module FakeIdp
     end
 
     def attributes_statement(attributes)
-      builder = Builder::XmlMarkup.new
-      builder.saml :AttributeStatement do
-        attributes.map do |name, value|
-          builder.saml :Attribute, Name: name do
-            builder.saml :AttributeValue, value
-          end
-        end
+      attributes_xml = attributes_xml(attributes).join
+
+      %[<saml:AttributeStatement>#{attributes_xml}</saml:AttributeStatement>]
+    end
+
+    def attributes_xml(attributes)
+      attributes.map do |name, value|
+        attribute_value = %[<saml:AttributeValue>#{value}</saml:AttributeValue>]
+
+        %[<saml:Attribute Name="#{name}">#{attribute_value}</saml:Attribute>]
       end
     end
   end

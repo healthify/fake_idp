@@ -7,6 +7,7 @@ module FakeIdp
         decode_SAMLRequest(mock_saml_request)
         @saml_acs_url = callback_url
 
+        configure_cert_and_key
         @saml_response = encode_SAMLResponse(
             name_id,
             attributes_provider: attributes_statement(signed_in_user_attrs)
@@ -22,6 +23,12 @@ module FakeIdp
 
     def callback_url
       FakeIdp.configuration.callback_url
+    end
+
+    def configure_cert_and_key
+      self.x509_certificate = Base64.encode64(FakeIdp.configuration.idp_certificate).delete("\n")
+      self.secret_key = FakeIdp.configuration.idp_secret_key
+      self.algorithm = FakeIdp.configuration.algorithm
     end
 
     def signed_in_user_attrs
@@ -46,13 +53,16 @@ module FakeIdp
     end
 
     def attributes_statement(attributes)
-      builder = Builder::XmlMarkup.new
-      builder.saml :AttributeStatement do
-        attributes.map do |name, value|
-          builder.saml :Attribute, Name: name do
-            builder.saml :AttributeValue, value
-          end
-        end
+      attributes_xml = attributes_xml(attributes).join
+
+      %[<saml:AttributeStatement>#{attributes_xml}</saml:AttributeStatement>]
+    end
+
+    def attributes_xml(attributes)
+      attributes.map do |name, value|
+        attribute_value = %[<saml:AttributeValue>#{value}</saml:AttributeValue>]
+
+        %[<saml:Attribute Name="#{name}">#{attribute_value}</saml:Attribute>]
       end
     end
   end

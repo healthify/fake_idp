@@ -54,6 +54,9 @@ FakeIdp.configure do |config|
   config.sso_uid = '12345'
   config.name_id = 'user@example.com'
   config.username = nil
+  config.idp_certificate = "YOUR CERT HERE"
+  config.idp_secret_key = "YOUR KEY HERE"
+  config.algorithm = :sha512
 end
 ```
 

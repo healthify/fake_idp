@@ -6,7 +6,11 @@ require 'fake_idp/version'
 Gem::Specification.new do |spec|
   spec.name          = "fake_idp"
   spec.version       = FakeIdp::VERSION
-  spec.authors       = ["Shelby Switzer"]
+  spec.authors       = [
+    "Shelby Switzer",
+    "Tyler Willingham",
+    "Robyn-Dale Samuda",
+  ]
   spec.email         = ["shelby@healthify.us"]
 
   spec.summary       = 'Fake IDP to test SAML authentication'
@@ -31,5 +35,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "dotenv", "~> 1.0"
   spec.add_runtime_dependency 'sinatra', '~> 2.0.0'
   spec.add_runtime_dependency 'ruby-saml-idp'
-  spec.add_runtime_dependency 'builder', '~> 3.1', '>=2.0'
 end

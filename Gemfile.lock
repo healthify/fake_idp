@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/lawrencepit/ruby-saml-idp.git
+  remote: https://github.com/lawrencepit/ruby-saml-idp.git
   revision: ae53d76af08711affaeb182e7a877676ab554818
   specs:
     ruby-saml-idp (0.3.2)

@@ -10,8 +10,8 @@ This is an open source Ruby gem intended for developers needing to spin up a fak
 
 Clone the repo and `cd` into the project directory.
 
-```ruby
-bundle install
+```sh
+bin/setup
 ```
 
 ## Running in Development

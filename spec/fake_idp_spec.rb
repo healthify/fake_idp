@@ -53,6 +53,12 @@ describe FakeIdp do
           FakeIdp.configure { |config| config.algorithm = :sha512 }
         end.to change { FakeIdp.configuration.algorithm }.from(:sha1).to(:sha512)
       end
+
+      it "sets the additional_attributes" do
+        expect do
+          FakeIdp.configure { |config| config.additional_attributes = { foo: "bar" } }
+        end.to change { FakeIdp.configuration.additional_attributes }.from({}).to({ foo: "bar" })
+      end
     end
   end
 end

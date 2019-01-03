@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/lawrencepit/ruby-saml-idp.git
+  remote: https://github.com/lawrencepit/ruby-saml-idp.git
   revision: ae53d76af08711affaeb182e7a877676ab554818
   specs:
     ruby-saml-idp (0.3.2)
@@ -9,12 +9,14 @@ PATH
   remote: .
   specs:
     fake_idp (0.3.0)
+      builder
       ruby-saml-idp
       sinatra (~> 2.0.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    builder (3.2.3)
     diff-lcs (1.2.5)
     dotenv (1.0.2)
     macaddr (1.7.1)

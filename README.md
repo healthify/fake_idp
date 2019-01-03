@@ -32,8 +32,8 @@ You can copy that over to your own `.env` file to set these environment variable
 
 Next, to start the server, you can run:
 
-```ruby
-bundle exec rackup
+```sh
+bin/server
 ```
 
 Then navigate to `http://localhost:9292/saml/auth` to begin making your SAML requests.

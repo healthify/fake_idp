@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
     "Tyler Willingham",
     "Robyn-Dale Samuda",
   ]
-  spec.email         = ["shelby@healthify.us"]
+  spec.email         = ["engineering@healthify.us"]
 
   spec.summary       = 'Fake IDP to test SAML authentication'
   spec.license       = "MIT"

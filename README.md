@@ -40,15 +40,17 @@ Then navigate to `http://localhost:9292/saml/auth` to begin making your SAML req
 
 ## Running in Test
 
-If you are using this gem to provide a Fake IDP server in a test suite, add the gem
-to the Gemfile:
+### Gemfile
+
+If you are using this gem to provide a Fake IDP server in a test suite, add the gem to the Gemfile:
 
 ```ruby
 gem 'fake_idp', github: 'healthify/fake_idp'
 ```
 
-You can set the relevant variables in a configuration block if they aren't provided 
-as environment variables. For example:
+### Configuration
+
+You can set the relevant variables in a configuration block if they aren't provided as environment variables. For example:
 
 ```ruby
 FakeIdp.configure do |config|
@@ -59,10 +61,21 @@ FakeIdp.configure do |config|
   config.idp_certificate = "YOUR CERT HERE"
   config.idp_secret_key = "YOUR KEY HERE"
   config.algorithm = :sha512
+  config.additional_attributes = { custom_saml_attr: "DELIVERED_IN_ASSERTION" }
 end
 ```
 
-And then use Capybara Discoball to spin it up in a test:
+#### Resetting Configuration
+
+If you ever want to reset your FakeIdp configuration (e.g. between test specs), you can use the following:
+
+```ruby
+FakeIdp.reset!
+```
+
+### Use
+
+You can use Capybara Discoball to spin `FakeIdp::Application` up in a test:
 
 ```ruby
 require 'fake_idp'

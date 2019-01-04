@@ -10,7 +10,7 @@ module FakeIdp
         configure_cert_and_key
         @saml_response = encode_SAMLResponse(
             name_id,
-            attributes_provider: attributes_statement(signed_in_user_attrs)
+            attributes_provider: attributes_statement(user_attrs),
         )
 
         erb :auth
@@ -29,6 +29,10 @@ module FakeIdp
       self.x509_certificate = Base64.encode64(FakeIdp.configuration.idp_certificate).delete("\n")
       self.secret_key = FakeIdp.configuration.idp_secret_key
       self.algorithm = FakeIdp.configuration.algorithm
+    end
+
+    def user_attrs
+      signed_in_user_attrs.merge(FakeIdp.configuration.additional_attributes)
     end
 
     def signed_in_user_attrs

@@ -18,4 +18,8 @@ module FakeIdp
   def self.configure
     yield(configuration)
   end
+
+  def self.reset!
+    @configuration = nil
+  end
 end

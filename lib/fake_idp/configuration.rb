@@ -11,6 +11,7 @@ module FakeIdp
       :idp_certificate,
       :idp_secret_key,
       :algorithm,
+      :additional_attributes,
     )
 
     def initialize
@@ -24,6 +25,7 @@ module FakeIdp
       @idp_certificate = default_idp_certificate
       @idp_secret_key = default_idp_secret_key
       @algorithm = default_algorithm
+      @additional_attributes = {}
     end
 
     private

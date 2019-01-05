@@ -10,6 +10,7 @@ Gem::Specification.new do |spec|
     "Shelby Switzer",
     "Tyler Willingham",
     "Robyn-Dale Samuda",
+    "Chet Bortz",
   ]
   spec.email         = ["engineering@healthify.us"]
 

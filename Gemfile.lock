@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (0.3.0)
+    fake_idp (0.4.0)
       ruby-saml-idp
       sinatra (~> 2.0.0)
 
@@ -59,4 +59,4 @@ DEPENDENCIES
   ruby-saml-idp!
 
 BUNDLED WITH
-   1.16.6
+   1.17.3

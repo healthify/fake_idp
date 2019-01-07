@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'ruby-saml-idp'
-require 'builder'
 require 'zlib'
 require 'tilt/erb'
 require 'fake_idp/configuration'

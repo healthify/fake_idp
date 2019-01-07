@@ -8,15 +8,13 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (0.3.0)
-      builder
+    fake_idp (0.4.0)
       ruby-saml-idp
       sinatra (~> 2.0.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    builder (3.2.3)
     diff-lcs (1.2.5)
     dotenv (1.0.2)
     macaddr (1.7.1)
@@ -61,4 +59,4 @@ DEPENDENCIES
   ruby-saml-idp!
 
 BUNDLED WITH
-   1.16.6
+   1.17.3

@@ -12,6 +12,7 @@ module FakeIdp
       :idp_secret_key,
       :algorithm,
       :additional_attributes,
+      :encryption_enabled,
     )
 
     def initialize
@@ -26,6 +27,7 @@ module FakeIdp
       @idp_secret_key = default_idp_secret_key
       @algorithm = default_algorithm
       @additional_attributes = {}
+      @encryption_enabled = default_encryption
     end
 
     private
@@ -43,6 +45,10 @@ module FakeIdp
     def default_algorithm
       ENV["ALGORITHM"]&.to_sym ||
         :sha1
+    end
+
+    def default_encryption
+      ENV["ENCRYPTION_ENABLED"] || true
     end
   end
 end

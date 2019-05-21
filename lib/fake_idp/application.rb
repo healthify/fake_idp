@@ -27,36 +27,40 @@ module FakeIdp
 
     private
 
+    def configuration
+      FakeIdp.configuration
+    end
+
     def callback_url
-      FakeIdp.configuration.callback_url
+      configuration.callback_url
     end
 
     def configure_cert_and_keys
       self.x509_certificate = idp_certificate
-      self.secret_key = FakeIdp.configuration.idp_secret_key
-      self.algorithm = FakeIdp.configuration.algorithm
+      self.secret_key = configuration.idp_secret_key
+      self.algorithm = configuration.algorithm
     end
 
     def idp_certificate
-      Base64.encode64(FakeIdp.configuration.idp_certificate).delete("\n")
+      Base64.encode64(configuration.idp_certificate).delete("\n")
     end
 
     def user_attrs
-      signed_in_user_attrs.merge(FakeIdp.configuration.additional_attributes)
+      signed_in_user_attrs.merge(configuration.additional_attributes)
     end
 
     def signed_in_user_attrs
       {
-        uuid: FakeIdp.configuration.sso_uid,
-        username: FakeIdp.configuration.username,
-        first_name: FakeIdp.configuration.first_name,
-        last_name: FakeIdp.configuration.last_name,
-        email: FakeIdp.configuration.email
+        uuid: configuration.sso_uid,
+        username: configuration.username,
+        first_name: configuration.first_name,
+        last_name: configuration.last_name,
+        email: configuration.email
       }
     end
 
     def name_id
-      FakeIdp.configuration.name_id
+      configuration.name_id
     end
 
     def mock_saml_request
@@ -104,9 +108,9 @@ module FakeIdp
       signature = %[<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">#{signed_info}<ds:SignatureValue>#{signature_value}</ds:SignatureValue><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>#{self.x509_certificate}</ds:X509Certificate></ds:X509Data></KeyInfo></ds:Signature>]
 
       assertion_and_signature = assertion.sub(/Issuer\>\<saml:Subject/, "Issuer>#{signature}<saml:Subject")
-      encrypted_assertion_and_signature = encrypt(assertion_and_signature)
+      assertion_and_signature = encrypt(assertion_and_signature) if configuration.encryption_enabled
 
-      xml = %[<samlp:Response ID="_#{response_id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{@saml_acs_url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified"#{@saml_request_id ? %[ InResponseTo="#{@saml_request_id}"] : ""} xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">#{issuer_uri}</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status>#{encrypted_assertion_and_signature}</samlp:Response>]
+      xml = %[<samlp:Response ID="_#{response_id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{@saml_acs_url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified"#{@saml_request_id ? %[ InResponseTo="#{@saml_request_id}"] : ""} xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">#{issuer_uri}</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status>#{assertion_and_signature}</samlp:Response>]
 
       Base64.encode64(xml)
     end

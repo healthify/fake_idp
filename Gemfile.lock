@@ -9,9 +9,11 @@ PATH
   remote: .
   specs:
     fake_idp (0.4.0)
+      builder (>= 3.2.2)
       nokogiri (>= 1.6.2)
       ruby-saml-idp
       sinatra (~> 2.0.0)
+      xmlenc (>= 0.7.1)
 
 GEM
   remote: https://rubygems.org/
@@ -23,6 +25,7 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+    builder (3.2.3)
     concurrent-ruby (1.1.5)
     diff-lcs (1.2.5)
     dotenv (1.0.2)
@@ -82,7 +85,6 @@ DEPENDENCIES
   rake (~> 10.0)
   rspec (~> 3.0)
   ruby-saml-idp!
-  xmlenc (>= 0.7.1)
 
 BUNDLED WITH
    1.17.3

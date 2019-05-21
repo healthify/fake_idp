@@ -59,6 +59,12 @@ describe FakeIdp do
           FakeIdp.configure { |config| config.additional_attributes = { foo: "bar" } }
         end.to change { FakeIdp.configuration.additional_attributes }.from({}).to({ foo: "bar" })
       end
+
+      it "sets encryption_enabled" do
+        expect do
+          FakeIdp.configure { |config| config.encryption_enabled = false }
+        end.to change { FakeIdp.configuration.encryption_enabled }.from(true).to(false)
+      end
     end
   end
 

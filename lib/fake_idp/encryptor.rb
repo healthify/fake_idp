@@ -5,6 +5,8 @@ module FakeIdp
     ENCRYPTION_STRATEGY = "aes256-cbc".freeze
     KEY_TRANSPORT = "rsa-oaep-mgf1p".freeze
 
+    attr_reader :raw_xml, :idp_certificate, :encryption_key
+
     def initialize(raw_xml, idp_certificate)
       @raw_xml = raw_xml
       @idp_certificate = idp_certificate
@@ -15,7 +17,7 @@ module FakeIdp
     def encrypt
       encryption_template = Nokogiri::XML::Document.parse(build_encryption_template).root
       encrypted_data = Xmlenc::EncryptedData.new(encryption_template)
-      encryption_key = encrypted_data.encrypt(raw_xml)
+      @encryption_key = encrypted_data.encrypt(raw_xml)
       encrypted_key_node = encrypted_data.node.at_xpath(
         "//xenc:EncryptedData/ds:KeyInfo/xenc:EncryptedKey",
         Xmlenc::NAMESPACES
@@ -30,8 +32,6 @@ module FakeIdp
     end
 
     private
-
-    attr_reader :raw_xml, :idp_certificate
 
     def openssl_cert
       if idp_certificate.is_a?(String)

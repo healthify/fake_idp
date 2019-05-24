@@ -38,6 +38,10 @@ module FakeIdp
       self.algorithm = configuration.algorithm
     end
 
+    def certificate
+      Base64.encode64(configuration.certificate).delete("\n")
+    end
+
     def idp_certificate
       Base64.encode64(configuration.idp_certificate).delete("\n")
     end
@@ -107,7 +111,7 @@ module FakeIdp
       assertion_and_signature = assertion.sub(/Issuer\>\<saml:Subject/, "Issuer>#{signature}<saml:Subject")
 
       if configuration.encryption_enabled
-        assertion_and_signature = Encryptor.new(assertion_and_signature, idp_certificate).encrypt
+        assertion_and_signature = Encryptor.new(assertion_and_signature, certificate).encrypt
       end
 
       xml = %[<samlp:Response ID="_#{response_id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{@saml_acs_url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified"#{@saml_request_id ? %[ InResponseTo="#{@saml_request_id}"] : ""} xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">#{issuer_uri}</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status>#{assertion_and_signature}</samlp:Response>]

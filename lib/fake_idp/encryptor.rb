@@ -5,11 +5,11 @@ module FakeIdp
     ENCRYPTION_STRATEGY = "aes256-cbc".freeze
     KEY_TRANSPORT = "rsa-oaep-mgf1p".freeze
 
-    attr_reader :raw_xml, :idp_certificate, :encryption_key
+    attr_reader :raw_xml, :certificate, :encryption_key
 
-    def initialize(raw_xml, idp_certificate)
+    def initialize(raw_xml, certificate)
       @raw_xml = raw_xml
-      @idp_certificate = idp_certificate
+      @certificate = certificate
     end
 
     # Encryption approach borrowed from
@@ -21,7 +21,7 @@ module FakeIdp
       encrypted_key_node = encrypted_data.node.at_xpath(
         "//xenc:EncryptedData/ds:KeyInfo/xenc:EncryptedKey",
         Xmlenc::NAMESPACES
-      )   
+      )
       encrypted_key = Xmlenc::EncryptedKey.new(encrypted_key_node)
       encrypted_key.encrypt(openssl_cert.public_key, encryption_key)
 
@@ -34,10 +34,10 @@ module FakeIdp
     private
 
     def openssl_cert
-      if idp_certificate.is_a?(String)
-        @_openssl_cert ||= OpenSSL::X509::Certificate.new(Base64.decode64(idp_certificate))
+      if certificate.is_a?(String)
+        @_openssl_cert ||= OpenSSL::X509::Certificate.new(Base64.decode64(certificate))
       else
-        @_openssl_cert ||= idp_certificate
+        @_openssl_cert ||= certificate
       end
     end
 
@@ -61,7 +61,7 @@ module FakeIdp
               key_info_child.tag! "ds:KeyName"
               key_info_child.tag! "ds:X509Data" do |x509_data|
                 x509_data.tag! "ds:X509Certificate" do |x509_cert|
-                  x509_cert << idp_certificate.to_s.gsub(/-+(BEGIN|END) CERTIFICATE-+/, "")
+                  x509_cert << certificate.to_s.gsub(/-+(BEGIN|END) CERTIFICATE-+/, "")
                 end
               end
             end

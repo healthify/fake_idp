@@ -36,6 +36,12 @@ describe FakeIdp do
         expect(name_id).to eq('bobthessouser@example.com')
       end
 
+      it "sets the certificate" do
+        expect do
+          FakeIdp.configure { |config| config.certificate = "INVALID_CERT" }
+        end.to change { FakeIdp.configuration.certificate }.to("INVALID_CERT")
+      end
+
       it "sets the idp_certificate" do
         expect do
           FakeIdp.configure { |config| config.idp_certificate = "INVALID_CERT" }

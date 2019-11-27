@@ -9,14 +9,17 @@ module FakeIdp
     ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
     STATUS_CODE_VALUE = "urn:oasis:names:tc:SAML:2.0:status:Success"
     ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
-    CANONICAL_SCHEMA = "http://www.w3.org/2001/10/xml-exc-c14n#"
-    CANONICAL_VALUE = 1
     ENVELOPE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
     EMAIL_ADDRESS_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
     BEARER_FORMAT = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
     FEDERATION_SOURCE = "urn:federation:authentication:windows"
     SAML_VERSION = "2.0"
+
+    # For the time being we're only supporting a single canonical schema since
+    # supporting multiple is inconsequential to our immediate need.
+    CANONICAL_SCHEMA = "http://www.w3.org/2001/10/xml-exc-c14n#"
+    CANONICAL_VALUE = 1
 
     def initialize(
       name_id:,

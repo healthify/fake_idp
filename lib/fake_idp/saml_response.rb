@@ -9,8 +9,8 @@ module FakeIdp
     ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
     STATUS_CODE_VALUE = "urn:oasis:names:tc:SAML:2.0:status:Success"
     ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
-    SIGNATURE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#"
     CANONICAL_SCHEMA = "http://www.w3.org/2001/10/xml-exc-c14n#"
+    CANONICAL_VALUE = 1
     ENVELOPE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
     EMAIL_ADDRESS_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
@@ -40,7 +40,6 @@ module FakeIdp
       @secret_key = secret_key
       @builder = Nokogiri::XML::Builder.new
       @timestamp = Time.now
-      @digest_value = ""
     end
 
     def build
@@ -49,57 +48,47 @@ module FakeIdp
         build_status_segment(response)
         build_assertion_segment(response)
       end
-      @builder.to_xml
-      doc_digest = response_with_replaced_signatures(@builder.to_xml)
-      populate_signature_value(doc_digest)
+
+      document_with_digest = replace_digest_value(@builder.to_xml)
+      replace_signature_value(document_with_digest)
     end
 
     private
 
-    def response_with_replaced_signatures(document)
-      copied_doc = document.dup
+    def replace_digest_value(document)
+      document_copy = document.dup
+      working_document = Nokogiri::XML(document)
 
-      working_doc = Nokogiri::XML(document)
-
-      signature_element = working_doc.at_xpath("//ds:Signature", "ds" => DSIG)
+      # The signature element needs to be removed from the assertion before creating a digest
+      signature_element = working_document.at_xpath("//ds:Signature", "ds" => DSIG)
       signature_element.remove
 
-      assertion_without_signature = working_doc.
+      assertion_without_signature = working_document.
         at_xpath("//*[@ID=$id]", nil, "id" => assertion_reference_response_id)
-      canon_hashed_element = assertion_without_signature.canonicalize(1, nil)
+      canon_hashed_element = assertion_without_signature.canonicalize(CANONICAL_VALUE)
 
-      # Create Digest Value
-      digest_value = Base64.encode64(OpenSSL::Digest::SHA1.digest(canon_hashed_element)).strip
+      digest_value = Base64.encode64(algorithm.digest(canon_hashed_element)).strip
 
-      ## Append the working copy with the new digest value
-      copied_doc = Nokogiri::XML(copied_doc)
-      target_digest_node = copied_doc.at_xpath("//ds:DigestValue")
-
-      # Replace digest node value
+      # Replace digest node with the generated value
+      document_copy = Nokogiri::XML(document_copy)
+      target_digest_node = document_copy.at_xpath("//ds:DigestValue")
       target_digest_node.content = digest_value
-      copied_doc.to_xml
+      document_copy
     end
 
-    def populate_signature_value(document)
-      copied_doc = document.dup
+    def replace_signature_value(document)
+      document_copy = document.dup
+      signature_element = document.at_xpath("//ds:Signature", "ds" => DSIG)
 
-      working_doc = Nokogiri::XML(document)
-
-      signature_element = working_doc.at_xpath("//ds:Signature", "ds" => DSIG)
+      # The SignatureValue is a signed copy of the SignedInfo element
       signed_info_element = signature_element.at_xpath("./ds:SignedInfo", "ds" => DSIG)
-      canon_string = signed_info_element.canonicalize(1)
+      canon_string = signed_info_element.canonicalize(CANONICAL_VALUE)
 
       signature_value = sign(canon_string)
-      copied_doc = Nokogiri::XML(copied_doc)
-      target_signature_node = copied_doc.at_xpath("//ds:SignatureValue")
-      target_signature_node.content = signature_value
-      copied_doc.to_xml
-    end
 
-    def sign(data)
-      key = OpenSSL::PKey::RSA.new(@secret_key)
-      # TODO Replace the algorithm
-      Base64.encode64(key.sign(OpenSSL::Digest::SHA1.new, data)).gsub(/\n/, "")
+      target_signature_node = document_copy.at_xpath("//ds:SignatureValue")
+      target_signature_node.content = signature_value
+      document_copy.to_xml
     end
 
     def build_issuer_segment(parent_attribute)
@@ -120,34 +109,7 @@ module FakeIdp
           issuer << @issuer_uri
         end
 
-        assertion[:ds].Signature("xmlns:ds" => SIGNATURE_SCHEMA) do |signature|
-          signature[:ds].SignedInfo("xmlns:ds" => SIGNATURE_SCHEMA) do |signed_info|
-            signed_info[:ds].CanonicalizationMethod("Algorithm" => CANONICAL_SCHEMA)
-            signed_info[:ds].SignatureMethod("Algorithm" => "#{DSIG}#{@algorithm_name}")
-
-            signed_info[:ds].Reference("URI" => reference_uri) do |reference|
-              reference[:ds].Transforms do |transform|
-                transform[:ds].Transform("Algorithm" => ENVELOPE_SCHEMA)
-                transform[:ds].Transform("Algorithm" => CANONICAL_SCHEMA)
-              end
-
-              reference[:ds].DigestMethod("Algorithm" => "#{DSIG}#{@algorithm_name}")
-
-              # The digest_value is set during the request in application.rb
-              reference[:ds].DigestValue { |d| d << "" }
-            end
-          end
-
-          # The signature_value is set during the request in application.rb
-          signature[:ds].SignatureValue { |signature_value| signature_value << "" }
-          signature.KeyInfo("xmlns" => SIGNATURE_SCHEMA) do |key_info|
-            key_info[:ds].X509Data do |x509_data|
-              x509_data[:ds].X509Certificate do |x509_certificate|
-                x509_certificate << Base64.encode64(@certificate)
-              end
-            end
-          end
-        end
+        build_assertion_signature(assertion)
 
         assertion[:saml].Subject do |subject|
           subject[:saml].NameID("Format" => EMAIL_ADDRESS_FORMAT) do |name_id|
@@ -183,6 +145,57 @@ module FakeIdp
       end
     end
 
+    def build_assertion_signature(parent_attribute)
+      parent_attribute[:ds].Signature("xmlns:ds" => DSIG) do |signature|
+        signature[:ds].SignedInfo("xmlns:ds" => DSIG) do |signed_info|
+          signed_info[:ds].CanonicalizationMethod("Algorithm" => CANONICAL_SCHEMA)
+          signed_info[:ds].SignatureMethod("Algorithm" => "#{DSIG}#{@algorithm_name}")
+
+          signed_info[:ds].Reference("URI" => reference_uri) do |reference|
+            reference[:ds].Transforms do |transform|
+              transform[:ds].Transform("Algorithm" => ENVELOPE_SCHEMA)
+              transform[:ds].Transform("Algorithm" => CANONICAL_SCHEMA)
+            end
+
+            reference[:ds].DigestMethod("Algorithm" => "#{DSIG}#{@algorithm_name}")
+
+            # The digest_value is set and derived from creating a digest of the Assertion element
+            # without the signature element after the document is generated
+            reference[:ds].DigestValue { |d| d << "" }
+          end
+        end
+
+        # The signature_value is set and derived from signing the SignedInfo element after the
+        # document is generated
+        signature[:ds].SignatureValue { |signature_value| signature_value << "" }
+
+        signature.KeyInfo("xmlns" => DSIG) do |key_info|
+          key_info[:ds].X509Data do |x509_data|
+            x509_data[:ds].X509Certificate do |x509_certificate|
+              x509_certificate << Base64.encode64(@certificate)
+            end
+          end
+        end
+      end
+    end
+
+    def algorithm
+      raise "Algorithm name must be a Symbol" unless @algorithm_name.is_a?(Symbol)
+
+      case @algorithm_name
+      when :sha256 then OpenSSL::Digest::SHA256
+      when :sha384 then OpenSSL::Digest::SHA384
+      when :sha512 then OpenSSL::Digest::SHA512
+      else
+        OpenSSL::Digest::SHA1
+      end
+    end
+
+    def sign(data)
+      key = OpenSSL::PKey::RSA.new(@secret_key)
+      Base64.encode64(key.sign(algorithm.new, data)).gsub(/\n/, "")
+    end
+
     def reference_response_id
       @_reference_response_id ||= "_#{SecureRandom.uuid}"
     end
@@ -204,7 +217,7 @@ module FakeIdp
         "InResponseTo" => @saml_request_id,
         "IssueInstant" => @timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
         "Version" => SAML_VERSION,
-        "xmlns:ds" => "http://www.w3.org/2000/09/xmldsig#",
+        "xmlns:ds" => DSIG,
       }
     end
 

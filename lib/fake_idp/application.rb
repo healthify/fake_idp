@@ -1,4 +1,5 @@
 require_relative "encryptor"
+require_relative "saml_response"
 
 module FakeIdp
   class Application < Sinatra::Base

@@ -1,5 +1,3 @@
-require_relative "encryptor"
-
 module FakeIdp
   class Application < Sinatra::Base
     include SamlIdp::Controller

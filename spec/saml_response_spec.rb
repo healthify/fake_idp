@@ -1,31 +1,50 @@
 require_relative "spec_helper"
+require_relative "../lib/fake_idp/saml_response"
 require "ruby-saml"
 require "securerandom"
 
 RSpec.describe FakeIdp::SamlResponse do
+  before do
+    FakeIdp.configure do |config|
+      config.callback_url = "http://localhost.dev:3000/auth/saml/devidp/callback"
+      config.sso_uid = "12345"
+      config.username = "bobthessouser"
+      config.name_id = "bobthessouser@example.com"
+      config.first_name = "Reid"
+      config.last_name = "Smith"
+      configuration.email = "reid@msn.com"
+      config.idp_certificate = fake_public_certificate
+      config.idp_secret_key = fake_private_key
+      config.algorithm = :sha1
+    end
+  end
+
+  let(:configuration) { FakeIdp.configuration }
+
   it "generates a valid SAML response" do
     settings = OneLogin::RubySaml::Settings.new(
       name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:unidentified",
       allowed_clock_drift: 10000000,
-      assertion_consumer_service_url: "http://localhost.dev:3000/auth/saml/devidp/callback",
-      idp_cert: fake_public_certificate,
+      assertion_consumer_service_url: configuration.callback_url,
+      idp_cert: configuration.idp_certificate,
     )
+
     saml_response = FakeIdp::SamlResponse.new(
-      saml_acs_url: "http://localhost.dev:3000/auth/saml/devidp/callback",
+      saml_acs_url: configuration.callback_url,
       saml_request_id: "_#{SecureRandom.uuid}",
-      name_id: "888000",
+      name_id: configuration.name_id,
       audience_uri: "http://localhost.dev:3000",
       issuer_uri: "http://publichost.dev:3000",
-      algorithm_name: :sha1,
-      certificate: fake_public_certificate,
-      secret_key: fake_private_key,
+      algorithm_name: configuration.algorithm,
+      certificate: configuration.idp_certificate,
+      secret_key: configuration.idp_secret_key,
       encryption_enabled: false,
       user_attributes: {
-        uuid: "9087",
-        username: "reidsmith",
-        first_name: "Reid",
-        last_name: "Smith",
-        email: "reid@msn.com",
+        uuid: configuration.sso_uid,
+        username: configuration.username,
+        first_name: configuration.first_name,
+        last_name: configuration.last_name,
+        email: configuration.email,
       },
     ).build
 
@@ -34,9 +53,6 @@ RSpec.describe FakeIdp::SamlResponse do
 
     expect(response.errors).to be_empty
   end
-
-  it "generates a valid encrypted assertion"
-  # Assert decypted document content presence
 
   def fake_public_certificate
     # Valid until Nov 27, 2119

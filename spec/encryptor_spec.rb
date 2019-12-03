@@ -1,5 +1,6 @@
 require "spec_helper"
 require "builder"
+require_relative "../lib/fake_idp/encryptor"
 
 describe FakeIdp::Encryptor do
   it "encrypts and decrypts XML" do
@@ -11,7 +12,7 @@ describe FakeIdp::Encryptor do
 
     encrypted_doc = Nokogiri::XML::Document.parse(encrypted_xml)
     encrypted_data = Xmlenc::EncryptedData.new(
-      encrypted_doc.at_xpath("//xenc:EncryptedData", Xmlenc::NAMESPACES)
+      encrypted_doc.at_xpath("//xenc:EncryptedData", Xmlenc::NAMESPACES),
     )
     decrypted_xml = encrypted_data.decrypt(encryptor.encryption_key)
 

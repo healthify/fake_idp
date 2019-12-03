@@ -19,6 +19,7 @@ RSpec.describe FakeIdp::SamlResponse do
       algorithm_name: :sha1,
       certificate: fake_public_certificate,
       secret_key: fake_private_key,
+      encryption_enabled: false,
       user_attributes: {
         uuid: "9087",
         username: "reidsmith",
@@ -33,6 +34,9 @@ RSpec.describe FakeIdp::SamlResponse do
 
     expect(response.errors).to be_empty
   end
+
+  it "generates a valid encrypted assertion"
+  # Assert decypted document content presence
 
   def fake_public_certificate
     # Valid until Nov 27, 2119

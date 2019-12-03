@@ -6,20 +6,20 @@ require "openssl"
 
 module FakeIdp
   class SamlResponse
-    ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
-    STATUS_CODE_VALUE = "urn:oasis:names:tc:SAML:2.0:status:Success"
-    ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
-    ENVELOPE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
-    EMAIL_ADDRESS_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-    BEARER_FORMAT = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
-    FEDERATION_SOURCE = "urn:federation:authentication:windows"
     SAML_VERSION = "2.0"
+    ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
+    ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
+    BEARER_FORMAT = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
+    ENVELOPE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+    STATUS_CODE_VALUE = "urn:oasis:names:tc:SAML:2.0:status:Success"
+    FEDERATION_SOURCE = "urn:federation:authentication:windows"
+    EMAIL_ADDRESS_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
 
     # For the time being we're only supporting a single canonical schema since
-    # supporting multiple is inconsequential to our immediate need.
-    CANONICAL_SCHEMA = "http://www.w3.org/2001/10/xml-exc-c14n#"
+    # supporting multiple is inconsequential for our immediate need.
     CANONICAL_VALUE = 1
+    CANONICAL_SCHEMA = "http://www.w3.org/2001/10/xml-exc-c14n#"
 
     def initialize(
       name_id:,
@@ -30,7 +30,8 @@ module FakeIdp
       user_attributes:,
       algorithm_name:,
       certificate:,
-      secret_key:
+      secret_key:,
+      encryption_enabled:
     )
       @name_id = name_id
       @audience_uri = audience_uri
@@ -41,6 +42,7 @@ module FakeIdp
       @algorithm_name = algorithm_name
       @certificate = certificate
       @secret_key = secret_key
+      @encryption_enabled = encryption_enabled
       @builder = Nokogiri::XML::Builder.new
       @timestamp = Time.now
     end
@@ -197,6 +199,10 @@ module FakeIdp
     def sign(data)
       key = OpenSSL::PKey::RSA.new(@secret_key)
       Base64.encode64(key.sign(algorithm.new, data)).gsub(/\n/, "")
+    end
+
+    def encrypt_assertion(document)
+      return document unless encryption_enabled
     end
 
     def reference_response_id

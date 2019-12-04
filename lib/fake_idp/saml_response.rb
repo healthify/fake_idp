@@ -201,10 +201,6 @@ module FakeIdp
       Base64.encode64(key.sign(algorithm.new, data)).gsub(/\n/, "")
     end
 
-    def encrypt_assertion(document)
-      return document unless encryption_enabled
-    end
-
     def reference_response_id
       @_reference_response_id ||= "_#{SecureRandom.uuid}"
     end

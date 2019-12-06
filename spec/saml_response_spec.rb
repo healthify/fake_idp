@@ -23,7 +23,6 @@ RSpec.describe FakeIdp::SamlResponse do
 
   it "generates a valid SAML response" do
     settings = OneLogin::RubySaml::Settings.new(
-      name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:unidentified",
       allowed_clock_drift: 10000000,
       assertion_consumer_service_url: configuration.callback_url,
       idp_cert: configuration.idp_certificate,

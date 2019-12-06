@@ -30,6 +30,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "nokogiri", ">= 1.10.5"
+  spec.add_dependency "builder", ">= 3.2.2"
+  spec.add_dependency "xmlenc", ">= 0.7.1"
+
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"

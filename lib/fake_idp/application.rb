@@ -7,7 +7,8 @@ module FakeIdp
         decode_SAMLRequest(mock_saml_request)
         @saml_acs_url = callback_url
 
-        configure_cert_and_key
+        configure_cert_and_keys
+
         @saml_response = encode_SAMLResponse(
             name_id,
             attributes_provider: attributes_statement(user_attrs),
@@ -21,32 +22,44 @@ module FakeIdp
 
     private
 
-    def callback_url
-      FakeIdp.configuration.callback_url
+    def configuration
+      FakeIdp.configuration
     end
 
-    def configure_cert_and_key
-      self.x509_certificate = Base64.encode64(FakeIdp.configuration.idp_certificate).delete("\n")
-      self.secret_key = FakeIdp.configuration.idp_secret_key
-      self.algorithm = FakeIdp.configuration.algorithm
+    def callback_url
+      configuration.callback_url
+    end
+
+    def configure_cert_and_keys
+      self.x509_certificate = idp_certificate
+      self.secret_key = configuration.idp_secret_key
+      self.algorithm = configuration.algorithm
+    end
+
+    def certificate
+      Base64.encode64(configuration.certificate).delete("\n")
+    end
+
+    def idp_certificate
+      Base64.encode64(configuration.idp_certificate).delete("\n")
     end
 
     def user_attrs
-      signed_in_user_attrs.merge(FakeIdp.configuration.additional_attributes)
+      signed_in_user_attrs.merge(configuration.additional_attributes)
     end
 
     def signed_in_user_attrs
       {
-        uuid: FakeIdp.configuration.sso_uid,
-        username: FakeIdp.configuration.username,
-        first_name: FakeIdp.configuration.first_name,
-        last_name: FakeIdp.configuration.last_name,
-        email: FakeIdp.configuration.email
+        uuid: configuration.sso_uid,
+        username: configuration.username,
+        first_name: configuration.first_name,
+        last_name: configuration.last_name,
+        email: configuration.email
       }
     end
 
     def name_id
-      FakeIdp.configuration.name_id
+      configuration.name_id
     end
 
     def mock_saml_request

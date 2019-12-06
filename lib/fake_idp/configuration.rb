@@ -8,10 +8,12 @@ module FakeIdp
       :last_name,
       :email,
       :name_id,
+      :certificate,
       :idp_certificate,
       :idp_secret_key,
       :algorithm,
       :additional_attributes,
+      :encryption_enabled,
     )
 
     def initialize
@@ -22,13 +24,20 @@ module FakeIdp
       @last_name = ENV['LAST_NAME']
       @email = ENV['EMAIL']
       @name_id = ENV['NAME_ID']
+      @certificate = default_certificate
       @idp_certificate = default_idp_certificate
       @idp_secret_key = default_idp_secret_key
       @algorithm = default_algorithm
       @additional_attributes = {}
+      @encryption_enabled = default_encryption
     end
 
     private
+
+    def default_certificate
+      ENV["CERTIFICATE"] ||
+        SamlIdp::Default::X509_CERTIFICATE
+    end
 
     def default_idp_certificate
       ENV["IDP_CERTIFICATE"] ||
@@ -43,6 +52,10 @@ module FakeIdp
     def default_algorithm
       ENV["ALGORITHM"]&.to_sym ||
         :sha1
+    end
+
+    def default_encryption
+      ENV["ENCRYPTION_ENABLED"] || true
     end
   end
 end

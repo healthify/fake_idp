@@ -18,12 +18,13 @@ bin/setup
 
 To run locally, you first need to set up the following environment variables:
 
-```ruby
-CALLBACK_URL (the URL of the Healthify app to POST to for SAML authentication - required)
-NAME_ID      (name_id of the user you want to log in as - may be nil/blank)
-SSO_UID      (unique id of the user you want to log in as - may be nil/blank)
-USERNAME     (username of the user you want to log in as - may be nil/blank)
-```
+|Variables|Description|
+|---|---|
+|CALLBACK_URL|The URL of the Healthify app to POST to for SAML authentication - required|
+|NAME_ID|Name_id of the user you want to log in as - may be nil/blank|
+|SSO_UID|Unique id of the user you want to log in as - may be nil/blank|
+|USERNAME|Username of the user you want to log in as - may be nil/blank|
+|ENCRYPTION_ENABLED|Determines whether the generated assertion should be encrypted or not. Defaults to true|
 
 The `.env.example` file has examples of what these env variables could look like.
 You can copy that over to your own `.env` file to set these environment variables:
@@ -58,8 +59,9 @@ FakeIdp.configure do |config|
   config.sso_uid = '12345'
   config.name_id = 'user@example.com'
   config.username = nil
-  config.idp_certificate = "YOUR CERT HERE"
-  config.idp_secret_key = "YOUR KEY HERE"
+  config.certificate = "YOUR CERT HERE"
+  config.idp_certificate = "YOUR IDP CERT HERE"
+  config.idp_secret_key = "YOUR IDP SECRET KEY HERE"
   config.algorithm = :sha512
   config.additional_attributes = { custom_saml_attr: "DELIVERED_IN_ASSERTION" }
 end

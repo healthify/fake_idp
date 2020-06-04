@@ -23,7 +23,6 @@ module FakeIdp
 
     def initialize(
       name_id:,
-      audience_uri:,
       issuer_uri:,
       saml_acs_url:,
       saml_request_id:,
@@ -34,7 +33,6 @@ module FakeIdp
       encryption_enabled:
     )
       @name_id = name_id
-      @audience_uri = audience_uri
       @issuer_uri = issuer_uri
       @saml_acs_url = saml_acs_url
       @saml_request_id = saml_request_id

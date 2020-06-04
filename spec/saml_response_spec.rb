@@ -32,7 +32,6 @@ RSpec.describe FakeIdp::SamlResponse do
       saml_acs_url: configuration.callback_url,
       saml_request_id: "_#{SecureRandom.uuid}",
       name_id: configuration.name_id,
-      audience_uri: "http://localhost.dev:3000",
       issuer_uri: "http://publichost.dev:3000",
       algorithm_name: configuration.algorithm,
       certificate: configuration.idp_certificate,

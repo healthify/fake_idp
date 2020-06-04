@@ -1,18 +1,15 @@
+require_relative "./saml_response"
+require "ruby-saml"
+
 module FakeIdp
   class Application < Sinatra::Base
     include SamlIdp::Controller
 
     get '/saml/auth' do
       begin
-        decode_SAMLRequest(mock_saml_request)
-        @saml_acs_url = callback_url
-
+        decode_SAMLRequest(generate_saml_request)
         configure_cert_and_keys
-
-        @saml_response = encode_SAMLResponse(
-            name_id,
-            attributes_provider: attributes_statement(user_attrs),
-        )
+        @saml_response = Base64.encode64(build_xml_saml_response)
 
         erb :auth
       rescue => e
@@ -22,12 +19,32 @@ module FakeIdp
 
     private
 
-    def configuration
-      FakeIdp.configuration
+    def build_xml_saml_response
+      FakeIdp::SamlResponse.new(
+        name_id: configuration.name_id,
+        issuer_uri: configuration.issuer,
+        saml_acs_url: @saml_acs_url, # Defined in #decode_SAMLRequest in the ruby-saml-idp gem
+        saml_request_id: @saml_request_id, # Defined in #decode_SAMLRequest in the ruby-saml-idp gem
+        user_attributes: user_attributes,
+        algorithm_name: configuration.algorithm,
+        certificate: configuration.idp_certificate,
+        secret_key: configuration.idp_secret_key,
+        encryption_enabled: configuration.encryption_enabled,
+      ).build
     end
 
-    def callback_url
-      configuration.callback_url
+    def user_attributes
+      {
+        uuid: configuration.sso_uid,
+        username: configuration.username,
+        first_name: configuration.first_name,
+        last_name: configuration.last_name,
+        email: configuration.email,
+      }
+    end
+
+    def configuration
+      FakeIdp.configuration
     end
 
     def configure_cert_and_keys
@@ -62,24 +79,18 @@ module FakeIdp
       configuration.name_id
     end
 
-    def mock_saml_request
-      current_gem_dir = File.dirname(__FILE__)
-      sample_file_name = "#{current_gem_dir}/sample_init_request.txt"
-      File.write(sample_file_name, params[:SAMLRequest]) if params[:SAMLRequest]
-      File.read(sample_file_name).strip
+    def generate_saml_request
+      auth_request = OneLogin::RubySaml::Authrequest.new
+      auth_url = auth_request.create(saml_settings)
+      CGI.unescape(auth_url.split("=").last)
     end
 
-    def attributes_statement(attributes)
-      attributes_xml = attributes_xml(attributes).join
-
-      %[<saml:AttributeStatement>#{attributes_xml}</saml:AttributeStatement>]
-    end
-
-    def attributes_xml(attributes)
-      attributes.map do |name, value|
-        attribute_value = %[<saml:AttributeValue>#{value}</saml:AttributeValue>]
-
-        %[<saml:Attribute Name="#{name}">#{attribute_value}</saml:Attribute>]
+    def saml_settings
+      OneLogin::RubySaml::Settings.new.tap do |setting|
+        setting.assertion_consumer_service_url = configuration.callback_url
+        setting.issuer = configuration.issuer
+        setting.idp_sso_target_url = configuration.idp_sso_target_url
+        setting.name_identifier_format = FakeIdp::SamlResponse::EMAIL_ADDRESS_FORMAT
       end
     end
   end

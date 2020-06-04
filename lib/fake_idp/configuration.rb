@@ -11,6 +11,8 @@ module FakeIdp
       :certificate,
       :idp_certificate,
       :idp_secret_key,
+      :idp_sso_target_url,
+      :issuer,
       :algorithm,
       :additional_attributes,
       :encryption_enabled,
@@ -27,6 +29,8 @@ module FakeIdp
       @certificate = default_certificate
       @idp_certificate = default_idp_certificate
       @idp_secret_key = default_idp_secret_key
+      @idp_sso_target_url = "https://idp.example.com/saml/idp"
+      @issuer = "https://foo.example.com"
       @algorithm = default_algorithm
       @additional_attributes = {}
       @encryption_enabled = default_encryption

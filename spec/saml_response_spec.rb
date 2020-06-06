@@ -3,6 +3,26 @@ require_relative "../lib/fake_idp/saml_response"
 require "ruby-saml"
 require "securerandom"
 
+# module OneLogin
+#   module RubySaml
+#     class Response < SamlMessage
+#       def decrypt_element(encrypt_node, rgrex)
+#         if settings.nil? || !settings.get_sp_key
+#           raise ValidationError.new('An ' + encrypt_node.name + ' found and no SP private key found on the settings to decrypt it')
+#         end
+
+#         node_header = '<node xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">'
+# binding.pry
+#         elem_plaintext = OneLogin::RubySaml::Utils.decrypt_data(encrypt_node, settings.get_sp_key)
+#         elem_plaintext = elem_plaintext.match(rgrex)[0]
+#         elem_plaintext = node_header + elem_plaintext + '</node>'
+#         doc = REXML::Document.new(elem_plaintext)
+#         doc.root[0]
+#       end
+#     end
+#   end
+# end
+
 RSpec.describe FakeIdp::SamlResponse do
   before do
     FakeIdp.configure do |config|
@@ -26,6 +46,7 @@ RSpec.describe FakeIdp::SamlResponse do
       allowed_clock_drift: 10000000,
       assertion_consumer_service_url: configuration.callback_url,
       idp_cert: configuration.idp_certificate,
+      private_key: fake_private_key,
     )
 
     saml_response = FakeIdp::SamlResponse.new(
@@ -36,7 +57,7 @@ RSpec.describe FakeIdp::SamlResponse do
       algorithm_name: configuration.algorithm,
       certificate: configuration.idp_certificate,
       secret_key: configuration.idp_secret_key,
-      encryption_enabled: false,
+      encryption_enabled: true,
       user_attributes: {
         uuid: configuration.sso_uid,
         username: configuration.username,

@@ -1,4 +1,5 @@
 require "xmlenc"
+require "builder"
 
 module FakeIdp
   class Encryptor
@@ -61,7 +62,7 @@ module FakeIdp
           key_info.EncryptedKey(Id: "EK", xmlns: "http://www.w3.org/2001/04/xmlenc#") do |enc_key|
             enc_key.EncryptionMethod(Algorithm: key_transport_ns)
             enc_key.tag!("ds:KeyInfo", "xmlns:ds" => "http://www.w3.org/2000/09/xmldsig#") do |key_info_child|
-              key_info_child.tag!("ds:KeyName")
+              # key_info_child.tag!("ds:KeyName")
               key_info_child.tag!("ds:X509Data") do |x509_data|
                 x509_data.tag!("ds:X509Certificate") do |x509_cert|
                   x509_cert << certificate.to_s.gsub(/-+(BEGIN|END) CERTIFICATE-+/, "")

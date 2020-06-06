@@ -3,10 +3,13 @@
 require "securerandom"
 require "nokogiri"
 require "openssl"
+require_relative "./encryptor"
+require "pry"
 
 module FakeIdp
   class SamlResponse
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
+    ASSERTION_FORMAT = "urn:oasis:names:tc:SAML:2.0:assertion"
     SAML_VERSION = "2.0"
     ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
     ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
@@ -52,13 +55,40 @@ module FakeIdp
         build_assertion_segment(response)
       end
 
-      document_with_digest = replace_digest_value(@builder.to_xml)
-      replace_signature_value(document_with_digest)
+      document_with_digest = replace_digest_value!(@builder.to_xml)
+      document = replace_signature_value!(document_with_digest)
+      encrypt_assertion!(document)
     end
 
     private
 
-    def replace_digest_value(document)
+    def encrypt_assertion!(document)
+      return unless @encryption_enabled
+# binding.pry
+      document_copy = document.dup
+      working_document = Nokogiri::XML(document)
+      assertion = working_document.at_xpath("//saml:Assertion", "saml" => ASSERTION_FORMAT)
+      encrypted_assertion_xml = FakeIdp::Encryptor.new(
+        assertion.to_xml,
+        Base64.encode64(@certificate).delete("\n"),
+      ).encrypt
+# binding.pry
+      # Replace Assertion node with encrypted assertion
+      document_copy = Nokogiri::XML(document_copy)
+      target_assertion_node = document_copy.at_xpath(
+        "//saml:Assertion",
+        "saml" => ASSERTION_FORMAT,
+      )
+      target_assertion_node.replace(encrypted_assertion_xml)
+      # document_copy.set_attribute "xmlns:ds", "http://www.w3.org/2000/09/xmldsig#"
+# binding.pry
+      new_doc = document_copy.to_s.gsub!("<ds:KeyInfo>", "<ds:KeyInfo xmlns:ds='http://www.w3.org/2000/09/xmldsig#'>")
+      new_doc = new_doc.to_s.gsub!("<ds:X509Data>", "<ds:X509Data xmlns:ds='http://www.w3.org/2000/09/xmldsig#'>")
+      new_doc
+      # document_copy.to_xml
+    end
+
+    def replace_digest_value!(document)
       document_copy = document.dup
       working_document = Nokogiri::XML(document)
 
@@ -79,7 +109,7 @@ module FakeIdp
       document_copy
     end
 
-    def replace_signature_value(document)
+    def replace_signature_value!(document)
       document_copy = document.dup
       signature_element = document.at_xpath("//ds:Signature", "ds" => DSIG)
 
@@ -172,7 +202,7 @@ module FakeIdp
         # document is generated
         signature[:ds].SignatureValue { |signature_value| signature_value << "" }
 
-        signature.KeyInfo("xmlns" => DSIG) do |key_info|
+        signature.KeyInfo("xmlns:ds" => DSIG) do |key_info|
           key_info[:ds].X509Data do |x509_data|
             x509_data[:ds].X509Certificate do |x509_certificate|
               x509_certificate << Base64.encode64(@certificate)
@@ -230,6 +260,7 @@ module FakeIdp
         "ID" => assertion_reference_response_id,
         "IssueInstant" => @timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
         "Version" => SAML_VERSION,
+        "xmlns:ds" => "http://www.w3.org/2000/09/xmldsig#",
       }
     end
 

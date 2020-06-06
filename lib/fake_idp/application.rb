@@ -10,7 +10,7 @@ module FakeIdp
         decode_SAMLRequest(generate_saml_request)
         configure_cert_and_keys
         @saml_response = Base64.encode64(build_xml_saml_response)
-
+binding.pry
         erb :auth
       rescue => e
         puts e

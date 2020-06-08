@@ -3,12 +3,13 @@
 require "securerandom"
 require "nokogiri"
 require "openssl"
+require_relative "./encryptor"
 
 module FakeIdp
   class SamlResponse
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
     SAML_VERSION = "2.0"
-    ISSUER_VALUE = "urn:oasis:names:tc:SAML:2.0:assertion"
+    ASSERTION_NAMESPACE = "urn:oasis:names:tc:SAML:2.0:assertion"
     ENTITY_FORMAT = "urn:oasis:names:SAML:2.0:nameid-format:entity"
     BEARER_FORMAT = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
     ENVELOPE_SCHEMA = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
@@ -23,7 +24,6 @@ module FakeIdp
 
     def initialize(
       name_id:,
-      audience_uri:,
       issuer_uri:,
       saml_acs_url:,
       saml_request_id:,
@@ -31,10 +31,9 @@ module FakeIdp
       algorithm_name:,
       certificate:,
       secret_key:,
-      encryption_enabled:
+      encryption_enabled: false
     )
       @name_id = name_id
-      @audience_uri = audience_uri
       @issuer_uri = issuer_uri
       @saml_acs_url = saml_acs_url
       @saml_request_id = saml_request_id
@@ -55,10 +54,32 @@ module FakeIdp
       end
 
       document_with_digest = replace_digest_value(@builder.to_xml)
-      replace_signature_value(document_with_digest)
+      document = replace_signature_value(document_with_digest)
+      encrypt_assertion!(document)
     end
 
     private
+
+    def encrypt_assertion!(document)
+      return document unless @encryption_enabled
+
+      document_copy = document.dup
+      working_document = Nokogiri::XML(document)
+      assertion = working_document.at_xpath("//saml:Assertion", "saml" => ASSERTION_NAMESPACE)
+      encrypted_assertion_xml = FakeIdp::Encryptor.new(
+        assertion.to_xml,
+        @certificate,
+      ).encrypt
+
+      document_copy = Nokogiri::XML(document_copy)
+      target_assertion_node = document_copy.at_xpath(
+        "//saml:Assertion",
+        "saml" => ASSERTION_NAMESPACE,
+      )
+      # Replace Assertion node with encrypted assertion
+      target_assertion_node.replace(encrypted_assertion_xml)
+      document_copy.to_xml
+    end
 
     def replace_digest_value(document)
       document_copy = document.dup
@@ -76,7 +97,7 @@ module FakeIdp
 
       # Replace digest node with the generated value
       document_copy = Nokogiri::XML(document_copy)
-      target_digest_node = document_copy.at_xpath("//ds:DigestValue")
+      target_digest_node = document_copy.at_xpath("//ds:DigestValue", "ds" => DSIG)
       target_digest_node.content = digest_value
       document_copy
     end
@@ -91,13 +112,13 @@ module FakeIdp
 
       signature_value = sign(canon_string)
 
-      target_signature_node = document_copy.at_xpath("//ds:SignatureValue")
+      target_signature_node = document_copy.at_xpath("//ds:SignatureValue", "ds" => DSIG)
       target_signature_node.content = signature_value
       document_copy.to_xml
     end
 
     def build_issuer_segment(parent_attribute)
-      parent_attribute[:saml].Issuer("xmlns:saml" => ISSUER_VALUE) do |issuer|
+      parent_attribute[:saml].Issuer("xmlns:saml" => ASSERTION_NAMESPACE) do |issuer|
         issuer << @issuer_uri
       end
     end
@@ -166,7 +187,7 @@ module FakeIdp
 
             # The digest_value is set and derived from creating a digest of the Assertion element
             # without the signature element after the document is generated
-            reference[:ds].DigestValue { |d| d << "" }
+            reference[:ds].DigestValue("xmlns:ds" => DSIG) { |d| d << "" }
           end
         end
 
@@ -174,7 +195,7 @@ module FakeIdp
         # document is generated
         signature[:ds].SignatureValue { |signature_value| signature_value << "" }
 
-        signature.KeyInfo("xmlns" => DSIG) do |key_info|
+        signature.KeyInfo("xmlns:ds" => DSIG) do |key_info|
           key_info[:ds].X509Data do |x509_data|
             x509_data[:ds].X509Certificate do |x509_certificate|
               x509_certificate << Base64.encode64(@certificate)
@@ -222,13 +243,12 @@ module FakeIdp
         "InResponseTo" => @saml_request_id,
         "IssueInstant" => @timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
         "Version" => SAML_VERSION,
-        "xmlns:ds" => DSIG,
       }
     end
 
     def assertion_namespace_attributes
       {
-        "xmlns:saml" => ISSUER_VALUE,
+        "xmlns:saml" => ASSERTION_NAMESPACE,
         "ID" => assertion_reference_response_id,
         "IssueInstant" => @timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
         "Version" => SAML_VERSION,

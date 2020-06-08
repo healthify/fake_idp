@@ -4,7 +4,6 @@ require_relative "spec_helper"
 require_relative "../lib/fake_idp/saml_response"
 require "ruby-saml"
 require "securerandom"
-require "pry"
 
 RSpec.describe FakeIdp::SamlResponse do
   before do

@@ -8,12 +8,14 @@ module FakeIdp
     include SamlIdp::Controller
 
     get "/saml/auth" do
-      decode_SAMLRequest(generate_saml_request)
-      @saml_response = Base64.encode64(build_xml_saml_response).delete("\r\n")
+      begin
+        decode_SAMLRequest(generate_saml_request)
+        @saml_response = Base64.encode64(build_xml_saml_response).delete("\r\n")
 
-      erb :auth
-    rescue => e
-      puts e
+        erb :auth
+      rescue => e
+        puts e
+      end
     end
 
     private

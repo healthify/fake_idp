@@ -5,7 +5,7 @@ require_relative "../lib/fake_idp/encryptor"
 describe FakeIdp::Encryptor do
   it "encrypts and decrypts XML" do
     raw_xml = "<foo>bar</foo>"
-    encryptor = described_class.new(raw_xml, Base64.encode64(fake_certificate).delete("\n"))
+    encryptor = described_class.new(raw_xml, fake_certificate)
     encrypted_xml = encryptor.encrypt
 
     expect(encrypted_xml).to_not match raw_xml

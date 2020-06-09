@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "spec_helper"
 require_relative "../lib/fake_idp/saml_response"
 require "ruby-saml"
@@ -12,7 +14,7 @@ RSpec.describe FakeIdp::SamlResponse do
       config.name_id = "bobthessouser@example.com"
       config.first_name = "Reid"
       config.last_name = "Smith"
-      configuration.email = "reid@msn.com"
+      config.email = "reid@msn.com"
       config.idp_certificate = fake_public_certificate
       config.idp_secret_key = fake_private_key
       config.algorithm = :sha1
@@ -20,37 +22,71 @@ RSpec.describe FakeIdp::SamlResponse do
   end
 
   let(:configuration) { FakeIdp.configuration }
-
-  it "generates a valid SAML response" do
-    settings = OneLogin::RubySaml::Settings.new(
-      allowed_clock_drift: 10000000,
+  let(:settings) do
+    OneLogin::RubySaml::Settings.new(
+      allowed_clock_drift: 10_000_000,
       assertion_consumer_service_url: configuration.callback_url,
       idp_cert: configuration.idp_certificate,
+      private_key: fake_private_key,
     )
+  end
 
-    saml_response = FakeIdp::SamlResponse.new(
-      saml_acs_url: configuration.callback_url,
-      saml_request_id: "_#{SecureRandom.uuid}",
-      name_id: configuration.name_id,
-      audience_uri: "http://localhost.dev:3000",
-      issuer_uri: "http://publichost.dev:3000",
-      algorithm_name: configuration.algorithm,
-      certificate: configuration.idp_certificate,
-      secret_key: configuration.idp_secret_key,
-      encryption_enabled: false,
-      user_attributes: {
-        uuid: configuration.sso_uid,
-        username: configuration.username,
-        first_name: configuration.first_name,
-        last_name: configuration.last_name,
-        email: configuration.email,
-      },
-    ).build
+  context "encrypted assertion" do
+    it "generates a valid SAML response" do
+      saml_response = FakeIdp::SamlResponse.new(
+        saml_acs_url: configuration.callback_url,
+        saml_request_id: "_#{SecureRandom.uuid}",
+        name_id: configuration.name_id,
+        issuer_uri: "http://publichost.dev:3000",
+        algorithm_name: configuration.algorithm,
+        certificate: configuration.idp_certificate,
+        secret_key: configuration.idp_secret_key,
+        encryption_enabled: true,
+        user_attributes: {
+          uuid: configuration.sso_uid,
+          username: configuration.username,
+          first_name: configuration.first_name,
+          last_name: configuration.last_name,
+          email: configuration.email,
+        },
+      ).build
 
-    response = OneLogin::RubySaml::Response.new(saml_response, settings: settings)
-    response.is_valid?
+      response = OneLogin::RubySaml::Response.new(saml_response, settings: settings)
+      response.is_valid?
 
-    expect(response.errors).to be_empty
+      expect(response.errors).to be_empty
+      expect(response.decrypted_document.to_s).to be_present
+      expect(response.document.to_s).to be_present
+    end
+  end
+
+  context "unencrypted assertion" do
+    it "generates a valid SAML response without a decrypted document value" do
+      saml_response = FakeIdp::SamlResponse.new(
+        saml_acs_url: configuration.callback_url,
+        saml_request_id: "_#{SecureRandom.uuid}",
+        name_id: configuration.name_id,
+        issuer_uri: "http://publichost.dev:3000",
+        algorithm_name: configuration.algorithm,
+        certificate: configuration.idp_certificate,
+        secret_key: configuration.idp_secret_key,
+        encryption_enabled: false,
+        user_attributes: {
+          uuid: configuration.sso_uid,
+          username: configuration.username,
+          first_name: configuration.first_name,
+          last_name: configuration.last_name,
+          email: configuration.email,
+        },
+      ).build
+
+      response = OneLogin::RubySaml::Response.new(saml_response, settings: settings)
+      response.is_valid?
+
+      expect(response.errors).to be_empty
+      expect(response.decrypted_document.to_s).to be_blank
+      expect(response.document.to_s).to be_present
+    end
   end
 
   def fake_public_certificate

@@ -1,4 +1,5 @@
 require "xmlenc"
+require "builder"
 
 module FakeIdp
   class Encryptor
@@ -35,7 +36,7 @@ module FakeIdp
 
     def openssl_cert
       @_openssl_cert ||= if certificate.is_a?(String)
-                           OpenSSL::X509::Certificate.new(Base64.decode64(certificate))
+                           OpenSSL::X509::Certificate.new(certificate)
                          else
                            certificate
                          end

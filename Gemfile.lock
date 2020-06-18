@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (0.6.0)
+    fake_idp (0.6.1)
       activesupport (~> 5.2.4.3)
       builder (>= 3.2.2)
       nokogiri (>= 1.10.5)

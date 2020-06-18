@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "xmlenc", ">= 0.7.1"
 
   spec.add_development_dependency "bundler", "~> 2"
-  spec.add_development_dependency "ruby-saml", "~> 1.11.0"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "dotenv", "~> 1.0"
@@ -44,4 +43,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "sinatra", "~> 2.0.0"
   spec.add_runtime_dependency "ruby-saml-idp"
+  spec.add_runtime_dependency "ruby-saml", "~> 1.11.0"
 end

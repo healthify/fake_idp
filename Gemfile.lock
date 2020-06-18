@@ -12,6 +12,7 @@ PATH
       activesupport (~> 5.2.4.3)
       builder (>= 3.2.2)
       nokogiri (>= 1.10.5)
+      ruby-saml (~> 1.11.0)
       ruby-saml-idp
       sinatra (~> 2.0.0)
       xmlenc (>= 0.7.1)
@@ -95,7 +96,6 @@ DEPENDENCIES
   pry (~> 0.12.2)
   rake (~> 13.0)
   rspec (~> 3.0)
-  ruby-saml (~> 1.11.0)
   ruby-saml-idp!
 
 BUNDLED WITH

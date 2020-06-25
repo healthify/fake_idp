@@ -11,6 +11,7 @@ describe FakeIdp::Configuration do
     it 'sets encryption_enabled to true' do
       expect(subject.encryption_enabled).to be_truthy
     end
+    after { ENV.delete('ENCRYPTION_ENABLED') }
   end
 
   context 'when ENCRYPTION_ENABLED is false' do
@@ -18,7 +19,6 @@ describe FakeIdp::Configuration do
     it 'sets encryption_enabled to false' do
       expect(subject.encryption_enabled).to be_falsey
     end
+    after { ENV.delete('ENCRYPTION_ENABLED') }
   end
-
-
 end

@@ -59,7 +59,7 @@ module FakeIdp
     end
 
     def default_encryption
-      !%w[FALSE OFF F NO].include?(ENV["ENCRYPTION_ENABLED"].to_s.upcase) && true
+      !ENV["ENCRYPTION_ENABLED"].to_s.empty?
     end
   end
 end

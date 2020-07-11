@@ -68,8 +68,8 @@ describe FakeIdp do
 
       it "sets encryption_enabled" do
         expect do
-          FakeIdp.configure { |config| config.encryption_enabled = false }
-        end.to change { FakeIdp.configuration.encryption_enabled }.from(true).to(false)
+          FakeIdp.configure { |config| config.encryption_enabled = true }
+        end.to change { FakeIdp.configuration.encryption_enabled }.from(false).to(true)
       end
     end
   end

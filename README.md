@@ -24,7 +24,7 @@ To run locally, you first need to set up the following environment variables:
 |NAME_ID|Name_id of the user you want to log in as - may be nil/blank|
 |SSO_UID|Unique id of the user you want to log in as - may be nil/blank|
 |USERNAME|Username of the user you want to log in as - may be nil/blank|
-|ENCRYPTION_ENABLED|Determines whether the generated assertion should be encrypted or not. Defaults to true|
+|ENCRYPTION_ENABLED| Set to 'true' to indicate that the generated assertion should be encrypted. Defaults to false|
 
 The `.env.example` file has examples of what these env variables could look like.
 You can copy that over to your own `.env` file to set these environment variables:

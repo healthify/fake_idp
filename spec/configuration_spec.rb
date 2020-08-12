@@ -7,21 +7,26 @@ describe FakeIdp::Configuration do
   end
 
   context 'when ENCRYPTION_ENABLED is set' do
-    before { ENV['ENCRYPTION_ENABLED'] = 'some_value' }
+    before do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("ENCRYPTION_ENABLED").and_return("true")
+    end
+
     it 'sets encryption_enabled to true' do
       expect(subject.encryption_enabled).to be_truthy
     end
-    after { ENV.delete('ENCRYPTION_ENABLED') }
   end
 
   context 'when ENCRYPTION_ENABLED is implicitly disabled' do
-    [nil, ''].each do |encryption_off|
-      before { ENV['ENCRYPTION_ENABLED'] = encryption_off }
+    [nil, '', 'false'].each do |encryption_off|
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with("ENCRYPTION_ENABLED").and_return(encryption_off)
+      end
 
       it 'sets encryption_enabled to false' do
         expect(subject.encryption_enabled).to be_falsey
       end
-      after { ENV.delete('ENCRYPTION_ENABLED') }
     end
   end
 end

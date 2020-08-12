@@ -5,9 +5,15 @@ rvm:
   - 2.6
   - 2.5
   - 2.4
+  - truffleruby
+  - jruby
 sudo: false
 gemfile: Gemfile
 script: bundle exec rspec spec
 before_install:
   - gem update --system 3.1.2 --no-document
   - gem install bundler -v 2.1.2 --no-document
+jobs:
+  allow_failures:
+    - rvm: truffleruby
+    - rvm: jruby

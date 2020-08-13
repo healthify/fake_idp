@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (0.6.1)
+    fake_idp (1.0.0)
       activesupport (~> 5.2.4.3)
       builder (>= 3.2.2)
       nokogiri (>= 1.10.5)
@@ -29,10 +29,10 @@ GEM
       tzinfo (~> 1.1)
     builder (3.2.4)
     coderay (1.1.2)
-    concurrent-ruby (1.1.6)
+    concurrent-ruby (1.1.7)
     diff-lcs (1.4.2)
     dotenv (1.0.2)
-    i18n (1.8.3)
+    i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
@@ -41,7 +41,7 @@ GEM
     minitest (5.14.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    nokogiri (1.10.9)
+    nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     pry (0.12.2)
       coderay (~> 1.1.0)

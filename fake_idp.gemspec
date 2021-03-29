@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "nokogiri", ">= 1.10.5"
   spec.add_dependency "builder", ">= 3.2.2"
-  spec.add_dependency "activesupport", "~> 5.2.4.3"
+  spec.add_dependency "activesupport", "~> 5.2.5"
   spec.add_dependency "xmlenc", ">= 0.7.1"
 
   spec.add_development_dependency "bundler", "~> 2"

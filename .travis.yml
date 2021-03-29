@@ -4,7 +4,6 @@ rvm:
   - 2.7
   - 2.6
   - 2.5
-  - 2.4
   - truffleruby
   - jruby
 sudo: false
@@ -17,4 +16,3 @@ jobs:
   allow_failures:
     - rvm: truffleruby
     - rvm: jruby
-    - rvm: 2.4

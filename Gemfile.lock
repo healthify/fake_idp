@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (1.0.0)
+    fake_idp (1.0.1)
       activesupport (~> 5.2.5)
       builder (>= 3.2.2)
       nokogiri (>= 1.10.5)
@@ -32,7 +32,7 @@ GEM
     concurrent-ruby (1.1.8)
     diff-lcs (1.4.2)
     dotenv (1.0.2)
-    i18n (1.8.9)
+    i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     macaddr (1.7.1)
       systemu (~> 2.6.2)

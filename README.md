@@ -46,7 +46,9 @@ Then navigate to `http://localhost:9292/saml/auth` to begin making your SAML req
 If you are using this gem to provide a Fake IDP server in a test suite, add the gem to the Gemfile:
 
 ```ruby
-gem 'fake_idp', github: 'healthify/fake_idp'
+group :test do
+  gem 'fake_idp'
+end
 ```
 
 ### Configuration

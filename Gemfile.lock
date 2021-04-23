@@ -12,7 +12,7 @@ PATH
       activemodel (>= 5.2.5, < 7.0)
       builder (>= 3.2.2)
       nokogiri (>= 1.10.5)
-      ruby-saml (~> 1.11.0)
+      ruby-saml (<= 1.12.0)
       ruby-saml-idp
       sinatra (~> 2.0.0)
       xmlenc (>= 0.7.1)
@@ -102,4 +102,4 @@ DEPENDENCIES
   ruby-saml-idp!
 
 BUNDLED WITH
-   2.1.4
+   2.2.16

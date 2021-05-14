@@ -1,6 +1,6 @@
 # Fake IdP
 
-[![Build Status](https://travis-ci.com/healthify/fake_idp.svg?branch=master)](https://travis-ci.com/healthify/fake_idp)
+[![Build Status](https://travis-ci.com/healthify/fake_idp.svg?branch=main)](https://travis-ci.com/healthify/fake_idp)
 
 ## About
 

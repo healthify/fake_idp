@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "nokogiri", ">= 1.10.5"
+  spec.add_dependency "nokogiri", "~> 1.11.7"
   spec.add_dependency "builder", ">= 3.2.2"
   spec.add_dependency "activemodel", ">= 5.2.5", "< 7.0"
   spec.add_dependency "xmlenc", ">= 0.7.1"

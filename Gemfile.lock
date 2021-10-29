@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    fake_idp (1.0.4)
+    fake_idp (1.0.5)
       activemodel (>= 5.2.5, < 7.0)
       builder (>= 3.2.2)
       nokogiri (~> 1.12.5)

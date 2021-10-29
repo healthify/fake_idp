@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "nokogiri", ">= 1.10.5"
+  spec.add_dependency "nokogiri", "~> 1.12.5"
   spec.add_dependency "builder", ">= 3.2.2"
   spec.add_dependency "activemodel", ">= 5.2.5", "< 7.0"
   spec.add_dependency "xmlenc", ">= 0.7.1"
@@ -35,5 +35,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "sinatra", "~> 2.0.0"
   spec.add_runtime_dependency "ruby-saml-idp"
-  spec.add_runtime_dependency "ruby-saml", "~> 1.12"
+  spec.add_runtime_dependency "ruby-saml", "~> 1.13.0"
 end

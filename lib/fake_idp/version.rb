@@ -1,3 +1,3 @@
 module FakeIdp
-  VERSION = "1.0.5"
+  VERSION = "1.2.0"
 end

@@ -1,3 +1,5 @@
 .idea
 .env
+
+/Gemfile.lock
 /fake_idp-*.gem

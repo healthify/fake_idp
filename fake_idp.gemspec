@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
     "Robyn-Dale Samuda",
     "Chet Bortz",
   ]
+  
   spec.email         = ["engineering@healthify.us"]
 
   spec.summary       = 'Fake IDP to test SAML authentication'

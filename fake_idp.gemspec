@@ -34,5 +34,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "sinatra", ">= 2.0", "< 2.3"
   spec.add_runtime_dependency "ruby-saml-idp"
-  spec.add_runtime_dependency "ruby-saml", "~> 1.13.0"
+  spec.add_runtime_dependency "ruby-saml", "~> 1.17.0"
 end
